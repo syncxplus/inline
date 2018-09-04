@@ -3,4 +3,4 @@ outline.server:
   port: port
   key: key
 
-api-key: api:key
+spring.security.user.password: 123456
