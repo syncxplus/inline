@@ -1,0 +1,6 @@
+outline.server:
+  host: host
+  port: port
+  key: key
+
+api-key: api:key

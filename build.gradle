@@ -1,0 +1,33 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'io.spring.dependency-management' version '1.0.6.RELEASE'
+    id 'org.springframework.boot' version '2.0.4.RELEASE'
+}
+
+bootJar {
+    baseName 'inline'
+    version '0.1'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile (
+            'org.springframework.boot:spring-boot-devtools',
+            'org.springframework.boot:spring-boot-starter-web',
+            'org.apache.httpcomponents:httpclient:4.5.6',
+            fileTree(dir: 'libs', include: ['*.jar'])
+    )
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+}

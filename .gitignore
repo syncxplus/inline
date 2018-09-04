@@ -1,0 +1,7 @@
+.gradle
+.idea
+*.iml
+/build
+/out
+/logs
+application.properties
