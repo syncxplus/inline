@@ -8,6 +8,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -23,12 +24,14 @@ public class OutlineWrapper {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     private Object listUsers() {
-        return sslTemplate.getForObject(outlineApi.listUsers(), Map.class);
+        Map map = sslTemplate.getForObject(outlineApi.listUsers(), Map.class);
+        return ApiResponse.successfulResponse().setData(map).generate();
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     private Object createUser() {
-        return sslTemplate.postForObject(outlineApi.createUser(), null, String.class);
+        Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
+        return ApiResponse.successfulResponse().setData(map).generate();
     }
 
     @RequestMapping(value = "/{id}/name", method = RequestMethod.PUT)
@@ -38,13 +41,25 @@ public class OutlineWrapper {
         MultiValueMap<String, String> params= new LinkedMultiValueMap<>();
         params.add("name", name);
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
-        ResponseEntity<Object> response = sslTemplate.exchange(outlineApi.updateUserName(id), HttpMethod.PUT, entity, Object.class);
-        return response.getStatusCode().is2xxSuccessful();
+        ResponseEntity<String> response = sslTemplate.exchange(outlineApi.updateUserName(id), HttpMethod.PUT, entity, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return ApiResponse.successfulResponse().generate();
+        } else {
+            return ApiResponse.failedResponse(response.getStatusCode().name()).generate();
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     private Object deleteUser(@PathVariable("id") String id) {
-        ResponseEntity<Object> response = sslTemplate.exchange(outlineApi.deleteUser(id), HttpMethod.DELETE, null, Object.class);
-        return response.getStatusCode().is2xxSuccessful();
+        ResponseEntity<String> response = sslTemplate.exchange(outlineApi.deleteUser(id), HttpMethod.DELETE, null, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return ApiResponse.successfulResponse().generate();
+        } else {
+            return ApiResponse.failedResponse(response.getStatusCode().name()).generate();
+        }    }
+
+    @ExceptionHandler
+    private Object exceptionHandler(IOException e) {
+        return ApiResponse.failedResponse(e.getMessage()).setException(e.getClass().getName()).generate();
     }
 }

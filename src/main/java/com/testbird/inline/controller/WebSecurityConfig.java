@@ -1,14 +1,22 @@
 package com.testbird.inline.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    BasicAuthAdapter basicAuthAdapter;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
-        http.csrf().disable();
+        http.authorizeRequests()
+                .anyRequest().authenticated()
+                .and().httpBasic()
+                .and().csrf().disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(basicAuthAdapter);
     }
 }

@@ -27,11 +27,11 @@ To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedi
 # Example #
 ```
 创建用户：curl -u user:123456 -X POST http://127.0.0.1:8080/outline/
-返回：{"id":"19","name":"","password":"","port":,"method":"","accessUrl":""}
+返回：{"status":true,"id":"19","name":"","password":"","port":,"method":"","accessUrl":""}
 修改用户名称：curl -u user:123456 -X PUT -d 'name=大卫' http://127.0.0.1:8080/outline/19/name
-返回：true
+返回：{"status":true}
 删除用户：curl -u user:123456 -X DELETE http://127.0.0.1:8080/outline/19
-返回：true
+返回：{"status":true}
 用户列表：curl -u user:123456 http://127.0.0.1:8080/outline/
-返回：{"accessKeys":[{"id":"0","name":"","password":"","port":,"method":"","accessUrl":""}, ... ], "users":[]}
+返回：{"status":true,"accessKeys":[{"id":"0","name":"","password":"","port":,"method":"","accessUrl":""}, ... ], "users":[]}
 ```
