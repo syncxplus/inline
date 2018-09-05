@@ -56,7 +56,8 @@ public class OutlineWrapper {
             return ApiResponse.successfulResponse().generate();
         } else {
             return ApiResponse.failedResponse(response.getStatusCode().name()).generate();
-        }    }
+        }
+    }
 
     @ExceptionHandler
     private Object exceptionHandler(IOException e) {

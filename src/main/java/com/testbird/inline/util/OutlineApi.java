@@ -41,4 +41,12 @@ public class OutlineApi {
     public String deleteUser(String userId) {
         return String.format("https://%s:%s/%s/access-keys/%s", host, port, key, userId);
     }
+
+    public String serverStatus() {
+        return String.format("https://%s:%s/%s/server", host, port, key);
+    }
+
+    public String enableMetrics() {
+        return String.format("https://%s:%s/%s/metrics/enabled", host, port, key);
+    }
 }

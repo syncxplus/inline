@@ -18,7 +18,7 @@ import java.security.cert.X509Certificate;
 
 @Configuration
 public class HttpClient {
-    private final static int CONNECT_TIMEOUT = 10000; //10s
+    private final static int TIMEOUT = 10000; //10s
     @Bean(name = "sslTemplate")
     public RestTemplate insecure() {
         try {
@@ -28,7 +28,8 @@ public class HttpClient {
             CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
-            requestFactory.setConnectTimeout(CONNECT_TIMEOUT);
+            requestFactory.setConnectTimeout(TIMEOUT);
+            requestFactory.setReadTimeout(TIMEOUT);
             return new RestTemplate(requestFactory);
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
             e.printStackTrace();
