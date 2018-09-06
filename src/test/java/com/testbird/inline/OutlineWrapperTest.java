@@ -1,7 +1,7 @@
 package com.testbird.inline;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,8 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OutlineWrapperTest {
     private final static String CONTEXT = "/outline";
     private final static String TEST_NAME = "inline";
+    private final static ObjectMapper MAPPER = new ObjectMapper();
     private static String userId;
-
     private MockMvc mvc;
 
     @Autowired
@@ -63,30 +64,22 @@ public class OutlineWrapperTest {
      */
     @Test
     public void t1CreateUser() throws Exception {
-        String result = mvc.perform(post(CONTEXT).with(httpBasic(username, password)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        ObjectMapper mapper = new ObjectMapper();
-        Map map = mapper.readValue(result, Map.class);
-        userId = String.valueOf(map.get("id"));
-        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(map));
+        Map response = execute(mvc.perform(post(CONTEXT).with(httpBasic(username, password))));
+        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        Assert.assertEquals(response.get("status"), true);
+        userId = String.valueOf(response.get("id"));
     }
 
     @Test
     public void t2UpdateUserName() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.put(CONTEXT + "/" + userId + "/name")
+        Map response = execute(mvc.perform(MockMvcRequestBuilders
+                .put(CONTEXT + "/" + userId + "/name")
                 .with(httpBasic(username, password))
                 .param("name", TEST_NAME)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    public void t3DeleteUser() throws Exception {
-        mvc.perform(delete(CONTEXT + "/" + userId).with(httpBasic(username, password)))
-                .andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        ));
+        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        Assert.assertEquals(response.get("status"), true);
     }
 
     /**
@@ -95,15 +88,26 @@ public class OutlineWrapperTest {
      * "users" : [ ]
      * }
      */
-    @After
-    public void listUsers() throws Exception {
-        String result = mvc.perform(get(CONTEXT).with(httpBasic(username, password)))
+    @Test
+    public void t3ListUsers() throws Exception {
+        Map response = execute(mvc.perform(get(CONTEXT).with(httpBasic(username, password))));
+        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        Assert.assertEquals(response.get("status"), true);
+    }
+
+    @Test
+    public void t4DeleteUser() throws Exception {
+        Map response = execute(mvc.perform(delete(CONTEXT + "/" + userId).with(httpBasic(username, password))));
+        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        Assert.assertEquals(response.get("status"), true);
+    }
+
+    private Map execute(ResultActions result) throws Exception {
+        String content = result
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        ObjectMapper mapper = new ObjectMapper();
-        Map map = mapper.readValue(result, Map.class);
-        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(map));
+        return MAPPER.readValue(content, Map.class);
     }
 }
