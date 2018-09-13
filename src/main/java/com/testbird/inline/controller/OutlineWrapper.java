@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -57,6 +58,23 @@ public class OutlineWrapper {
         } else {
             return ApiResponse.failedResponse(response.getStatusCode().name()).generate();
         }
+    }
+
+    @RequestMapping(value = "/{id}/stats", method = RequestMethod.GET)
+    private Object userStats(@PathVariable("id") String id) {
+        Map<String, Object> stats = new HashMap<String, Object>() {{
+            put("id", id);
+            put("stats", 0);
+        }};
+        Map map = sslTemplate.getForObject(outlineApi.userStats(), Map.class);
+        if (map != null && map.containsKey("bytesTransferredByUserId")) {
+            Map metrics = (Map) map.get("bytesTransferredByUserId");
+            if (metrics != null && metrics.containsKey(id)) {
+                stats.put("stats", metrics.get(id));
+                return ApiResponse.successfulResponse().setData(stats).generate();
+            }
+        }
+        return ApiResponse.successfulResponse().setData(stats).generate();
     }
 
     @ExceptionHandler

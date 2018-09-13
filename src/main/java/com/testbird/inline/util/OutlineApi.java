@@ -49,4 +49,8 @@ public class OutlineApi {
     public String enableMetrics() {
         return String.format("https://%s:%s/%s/metrics/enabled", host, port, key);
     }
+
+    public String userStats() {
+        return String.format("https://%s:%s/%s/metrics/transfer", host, port, key);
+    }
 }

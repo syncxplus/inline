@@ -39,11 +39,11 @@ public class OutlineStatus {
                 Map status = response.getBody();
                 logger.info(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(status));
                 boolean metrics = (boolean) status.get("metricsEnabled");
-                if (!metrics) {
+                if (metrics) {
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     Map<String, Boolean> params= new HashMap<>();
-                    params.put("metricsEnabled", true);
+                    params.put("metricsEnabled", false);
                     HttpEntity<Map<String, Boolean>> entity = new HttpEntity<>(params, headers);
                     sslTemplate.put(outlineApi.enableMetrics(), entity);
                 }

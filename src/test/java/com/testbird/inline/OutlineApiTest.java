@@ -23,8 +23,26 @@ public class OutlineApiTest {
     RestTemplate sslTemplate;
 
     @Test
-    public void test() throws JsonProcessingException {
+    public void listUsers() throws JsonProcessingException {
         ResponseEntity<Map> response = sslTemplate.getForEntity(outlineApi.listUsers(), Map.class);
+        Assert.assertTrue(response.getStatusCode().is2xxSuccessful());
+        System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(response.getBody()));
+    }
+
+    /**
+     * {
+     *   "bytesTransferredByUserId" : {
+     *     "0" : 942672017,
+     *     "1" : 615353875,
+     *     "3" : 47,
+     *     "6" : 47,
+     *     "7" : 47
+     *   }
+     * }
+     */
+    @Test
+    public void userStats () throws JsonProcessingException {
+        ResponseEntity<Map> response = sslTemplate.getForEntity(outlineApi.userStats(), Map.class);
         Assert.assertTrue(response.getStatusCode().is2xxSuccessful());
         System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(response.getBody()));
     }

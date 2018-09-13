@@ -1,13 +1,12 @@
 # Authorization #
 To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedia.org/wiki/Basic_access_authentication#Client_side)
-- username: `user`
-- password: set at runtime
 
 # API #
 * [用户列表](#用户列表)
 * [创建用户](#创建用户)
 * [删除用户](#删除用户)
 * [修改用户名称](#修改用户名称)
+* [查看用量](#查看用量)
 
 ### 用户列表 ###
 ```GET /outline```
@@ -24,14 +23,24 @@ To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedi
 - 路径参数`id`: userId
 - 请求参数`name`: 新用户名称
 
+### 查看用量 ###
+```GET /outline/{id}/stats```
+- 路径参数`id`: userId
+
 # Example #
 ```
 创建用户：curl -u user:123456 -X POST http://127.0.0.1:8080/outline/
 返回：{"status":true,"id":"19","name":"","password":"","port":,"method":"","accessUrl":""}
+
 修改用户名称：curl -u user:123456 -X PUT -d 'name=大卫' http://127.0.0.1:8080/outline/19/name
 返回：{"status":true}
+
 删除用户：curl -u user:123456 -X DELETE http://127.0.0.1:8080/outline/19
 返回：{"status":true}
+
 用户列表：curl -u user:123456 http://127.0.0.1:8080/outline/
 返回：{"status":true,"accessKeys":[{"id":"0","name":"","password":"","port":,"method":"","accessUrl":""}, ... ], "users":[]}
+
+查看用量：curl -u user:123456 http://127.0.0.1:8080/outline/0/stats
+返回：{"status":true,"id":"0","stats":942672017} (stats in Bytes)
 ```
