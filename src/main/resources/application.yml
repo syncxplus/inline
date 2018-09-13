@@ -1,7 +1,7 @@
 outline.server:
   host: host
-  port: port
-  key: key
+  port: 1023
+  key: YiSSP-HOknt1mM7vKiu4DA
 
 spring.mvc.throw-exception-if-no-handler-found: true
 spring.security.user.password: 123456
