@@ -2,8 +2,8 @@ FROM openjdk:8u181-jdk-stretch
 
 LABEL maintainer="jibo@outlook.com"
 
-ENV GRADLE_VERSION 4.10
-ENV GRADLE_SHA 248cfd92104ce12c5431ddb8309cf713fe58de8e330c63176543320022f59f18
+ENV GRADLE_VERSION 4.10.1
+ENV GRADLE_SHA e53ce3a01cf016b5d294eef20977ad4e3c13e761ac1e475f1ffad4c6141a92bd
 RUN cd /usr/lib \
  && curl https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o gradle-bin.zip \
  && echo "$GRADLE_SHA gradle-bin.zip" | sha256sum -c - \
