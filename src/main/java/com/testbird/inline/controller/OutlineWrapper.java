@@ -1,6 +1,7 @@
 package com.testbird.inline.controller;
 
 import com.testbird.inline.util.OutlineApi;
+import com.testbird.inline.util.TrafficRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,10 +18,12 @@ import java.util.Map;
 public class OutlineWrapper {
     private final OutlineApi outlineApi;
     private final RestTemplate sslTemplate;
+    private final TrafficRule trafficRule;
 
-    public OutlineWrapper(@Autowired OutlineApi outlineApi, @Autowired RestTemplate sslTemplate) {
+    public OutlineWrapper(@Autowired OutlineApi outlineApi, @Autowired RestTemplate sslTemplate, @Autowired TrafficRule trafficRule) {
         this.outlineApi = outlineApi;
         this.sslTemplate = sslTemplate;
+        this.trafficRule = trafficRule;
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
@@ -32,6 +35,17 @@ public class OutlineWrapper {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     private Object createUser() {
         Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
+        return ApiResponse.successfulResponse().setData(map).generate();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = "/rate/{rate}", method = RequestMethod.POST)
+    private Object createUserWithRate(@PathVariable("rate") String rate) {
+        Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
+        String port = String.valueOf(map.get("port"));
+        map.put("add_tc_filter", trafficRule.addTcFilter(Integer.valueOf(port), Integer.valueOf(rate)));
+        map.put("add_iptables_rule", trafficRule.addIptablesRule(Integer.valueOf(port)));
         return ApiResponse.successfulResponse().setData(map).generate();
     }
 
@@ -55,6 +69,20 @@ public class OutlineWrapper {
         ResponseEntity<String> response = sslTemplate.exchange(outlineApi.deleteUser(id), HttpMethod.DELETE, null, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
             return ApiResponse.successfulResponse().generate();
+        } else {
+            return ApiResponse.failedResponse(response.getStatusCode().name()).generate();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = "/{id}/port/{port}/rate/{rate}", method = RequestMethod.DELETE)
+    private Object deleteUser(@PathVariable("id") String id, @PathVariable("port") String port, @PathVariable("rate") String rate) {
+        ResponseEntity<String> response = sslTemplate.exchange(outlineApi.deleteUser(id), HttpMethod.DELETE, null, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("rm_iptables_rule", trafficRule.rmIptablesRule(Integer.valueOf(port)));
+            map.put("rm_tc_filter", trafficRule.rmTcFilter(Integer.valueOf(port), Integer.valueOf(rate)));
+            return ApiResponse.successfulResponse().setData(map).generate();
         } else {
             return ApiResponse.failedResponse(response.getStatusCode().name()).generate();
         }

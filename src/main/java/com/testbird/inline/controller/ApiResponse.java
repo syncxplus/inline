@@ -1,9 +1,15 @@
 package com.testbird.inline.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
 class ApiResponse {
+    private final static Logger logger = LoggerFactory.getLogger(ApiResponse.class);
     private final boolean status;
     private final String message;
     private String exception;
@@ -41,6 +47,11 @@ class ApiResponse {
         data.put("message", message);
         if (exception != null) {
             data.put("exception", exception);
+        }
+        try {
+            logger.info(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(data));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
         return data;
     }
