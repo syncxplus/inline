@@ -3,5 +3,8 @@ outline.server:
   port: 1023
   key: YiSSP-HOknt1mM7vKiu4DA
 
-spring.mvc.throw-exception-if-no-handler-found: true
-spring.security.user.password: 123456
+spring:
+  mvc.throw-exception-if-no-handler-found: true
+  security.user.password: 123456
+
+management.endpoints.web.exposure.include: env,health,httptrace,info,logfile,metrics,sessions,version

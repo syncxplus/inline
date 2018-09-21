@@ -9,11 +9,11 @@ plugins {
     id 'java'
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
     id 'org.springframework.boot' version '2.0.5.RELEASE'
+    id 'com.gorylenko.gradle-git-properties' version '1.5.2'
 }
 
-bootJar {
-    baseName 'inline'
-    version '1.0'
+gitProperties {
+    dateFormat = 'yyyy-MM-dd HH:mm'
 }
 
 repositories {
@@ -21,11 +21,29 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    /**
+     * When release, version should be apply to three place:
+     * 1. build.gradle: String version
+     * 2. install.sh: export VERSION
+     * 3. git tag
+     */
+    String version = '1.1-dev'
+    new File("$projectDir/src/main/resources/version").text = "$version"
+    VERSION = "$version"
+}
+
+bootJar {
+    baseName 'inline'
+    version VERSION
+}
+
 dependencies {
     compile (
             'org.springframework.boot:spring-boot-devtools',
             'org.springframework.boot:spring-boot-starter-web',
             'org.springframework.boot:spring-boot-starter-security',
+            'org.springframework.boot:spring-boot-starter-actuator',
             'org.apache.httpcomponents:httpclient:4.5.6',
             'org.apache.commons:commons-exec:1.3',
             fileTree(dir: 'libs', include: ['*.jar'])

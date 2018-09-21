@@ -1,45 +1,57 @@
 package com.testbird.inline.controller;
 
 import com.testbird.inline.util.OutlineApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/version")
+@WebEndpoint(id = "version")
 public class Version {
-    private final static Logger logger = LoggerFactory.getLogger(Version.class);
+    private final static String version;
     private final OutlineApi outlineApi;
     private final RestTemplate sslTemplate;
+
+    static {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Version.class.getResourceAsStream("/version")))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        version = sb.toString();
+    }
 
     public Version(@Autowired OutlineApi outlineApi, @Autowired RestTemplate sslTemplate) {
         this.outlineApi = outlineApi;
         this.sslTemplate = sslTemplate;
     }
 
-    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
+    @ReadOperation
     private Map version() {
         Map<String, String> map = new HashMap<>();
-        map.put("SB_VERSION", String.valueOf(sslTemplate.getForObject(outlineApi.version(), Map.class).get("version")));
-        map.put("VERSION", System.getenv("VERSION"));
+        map.put("inline", version);
+        map.put("shadowbox", String.valueOf(sslTemplate.getForObject(outlineApi.version(), Map.class).get("version")));
         return ApiResponse.successfulResponse().setData(map).generate();
     }
 
-    @ExceptionHandler
-    private Object exceptionHandler(IOException e) {
-        logger.error(e.getMessage(), e);
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
+    private Map standalone() {
         Map<String, String> map = new HashMap<>();
-        map.put("SB_VERSION", e.getClass().getName());
-        map.put("VERSION", System.getenv("VERSION"));
+        map.put("inline", version);
         return ApiResponse.successfulResponse().setData(map).generate();
     }
 }

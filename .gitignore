@@ -4,4 +4,5 @@
 /build
 /out
 /logs
-application.properties
+/src/main/resources/application.properties
+/src/main/resources/version

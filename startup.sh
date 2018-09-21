@@ -3,4 +3,5 @@ set -x
 gradle clean
 gradle bootJar
 cd build/libs
-java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -jar ./inline-1.0.jar $1
+jar=`ls *.jar`
+echo java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -jar ${jar} $1
