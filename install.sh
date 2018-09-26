@@ -1,8 +1,7 @@
 #!/bin/sh
-set -x
 
-export VERSION=1.0
-export SB_VERSION=1.0
+export VERSION=1.1
+export SB_VERSION=1.1
 export LOGGING_PATH=/root/logs
 
 function checkCommand {
@@ -48,9 +47,12 @@ else
     yum install -y unzip
 fi
 
-killProcess "inline-${VERSION}.jar"
+killProcess "inline.*jar"
 [ -e "inline-${VERSION}.jar" ] && rm -rf inline-${VERSION}.jar
-curl -OL https://github.com/syncxplus/inline/releases/download/${VERSION}/inline.zip
-unzip -o inline.zip && rm -rf inline.zip
+
+set -euo pipefail
+
+curl -OL https://github.com/syncxplus/inline/releases/download/${VERSION}/inline-${VERSION}.zip
+unzip -o inline-${VERSION}.zip && rm -rf inline-${VERSION}.zip
 curl https://raw.githubusercontent.com/syncxplus/shadowbox/shadowbox/src/server_manager/install_scripts/install_server.sh | bash
 nohup java -jar inline-${VERSION}.jar ${1} &

@@ -6,9 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/rule")
 public class Rule {
@@ -19,17 +16,11 @@ public class Rule {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    private Object list() {
-        boolean result;
-        Map<String, Object> map = new HashMap<>();
-        map.put("tc", trafficRule.listTc());
-        result = trafficRule.isSuccess();
-        map.put("iptables", trafficRule.listIptables());
-        result &= trafficRule.isSuccess();
-        if (result) {
-            return ApiResponse.successfulResponse().setData(map).generate();
-        } else {
-            return ApiResponse.failedResponse(null).setData(map).generate();
-        }
+    private String list() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("tc").append(System.lineSeparator())
+                .append(trafficRule.listTc()).append(System.lineSeparator())
+                .append(trafficRule.listIptables()).append(System.lineSeparator());
+        return sb.toString();
     }
 }

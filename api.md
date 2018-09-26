@@ -6,7 +6,8 @@ To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedi
 * [创建用户](#创建用户)
 * [删除用户](#删除用户)
 * [修改用户名称](#修改用户名称)
-* [查看用量](#查看用量)
+* [创建限速用户](#创建限速用户)
+* [删除限速用户](#删除限速用户)
 
 ### 用户列表 ###
 ```GET /outline```
@@ -23,9 +24,21 @@ To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedi
 - 路径参数`id`: userId
 - 请求参数`name`: 新用户名称
 
-### 查看用量 ###
-```GET /outline/{id}/stats```
-- 路径参数`id`: userId
+### 创建限速用户 ###
+```POST /outline/rate/{rate}```
+
+rate | limit
+---- | ----
+1 | 1Mb
+2 | 2Mb
+3 | 3Mb
+5 | 5Mb
+8 | 8Mb
+10 | 10Mb
+20 | 20Mb
+
+### 删除限速用户 ###
+```DELETE /outline/{id}/port/{port}/rate/{rate}```
 
 # Example #
 ```
@@ -41,6 +54,6 @@ To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedi
 用户列表：curl -u user:123456 http://127.0.0.1:8080/outline/
 返回：{"status":true,"accessKeys":[{"id":"0","name":"","password":"","port":,"method":"","accessUrl":""}, ... ], "users":[]}
 
-查看用量：curl -u user:123456 http://127.0.0.1:8080/outline/0/stats
-返回：{"status":true,"id":"0","stats":942672017} (stats in Bytes)
+创建限速用户：curl -u user:123456 -X POST http://45.76.213.221:8080/outline/rate/5
+删除限速用户：curl -u user:123456 -X DELETE http://127.0.0.1:8080/outline/21/port/12384/rate/5
 ```

@@ -88,6 +88,7 @@ public class OutlineWrapper {
         }
     }
 
+    @Deprecated
     @RequestMapping(value = "/{id}/stats", method = RequestMethod.GET)
     private Object userStats(@PathVariable("id") String id) {
         Map<String, Object> stats = new HashMap<String, Object>() {{
