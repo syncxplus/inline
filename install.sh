@@ -55,4 +55,4 @@ set -euo pipefail
 curl -OL https://github.com/syncxplus/inline/releases/download/${VERSION}/inline-${VERSION}.zip
 unzip -o inline-${VERSION}.zip && rm -rf inline-${VERSION}.zip
 curl https://raw.githubusercontent.com/syncxplus/shadowbox/shadowbox/src/server_manager/install_scripts/install_server.sh | bash
-nohup java -jar inline-${VERSION}.jar ${1} &
+nohup java -jar inline-${VERSION}.jar ${1:-} &

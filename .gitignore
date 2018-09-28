@@ -1,8 +1,8 @@
 .gradle
 .idea
 *.iml
+application.properties
+version
 /build
 /out
 /logs
-/src/main/resources/application.properties
-/src/main/resources/version
