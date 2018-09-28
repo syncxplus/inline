@@ -16,12 +16,21 @@ public class Rule {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    private String list() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("********** tc **********").append(System.lineSeparator())
-                .append(trafficRule.listTc()).append(System.lineSeparator())
-                .append("********** iptables **********").append(System.lineSeparator())
-                .append(trafficRule.listIptables()).append(System.lineSeparator());
-        return sb.toString();
+    private String display() {
+        StringBuilder sb = new StringBuilder("********** tc **********").append(System.lineSeparator());
+        String tc = trafficRule.displayTc();
+        if (trafficRule.getExitCode() == 0) {
+            sb.append(tc);
+        } else {
+            sb.append("error:").append(trafficRule.getExitCode());
+        }
+        sb.append(System.lineSeparator()).append("********** iptables **********").append(System.lineSeparator());
+        String ipt = trafficRule.displayIpTables();
+        if (trafficRule.getExitCode() == 0) {
+            sb.append(ipt);
+        } else {
+            sb.append("error:").append(trafficRule.getExitCode());
+        }
+        return sb.append(System.lineSeparator()).toString();
     }
 }

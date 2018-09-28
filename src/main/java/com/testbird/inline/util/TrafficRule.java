@@ -21,7 +21,7 @@ public class TrafficRule {
     private final static String RM_TC_FILTER  = "tc filter del dev eth0 parent 1:0 prio 1 protocol ip handle %d fw flowid 1:%d0";
     private final static String ADD_IPTABLES_RULE = "iptables -A OUTPUT -t mangle -p tcp --sport %d -j MARK --set-mark %d";
     private final static String RM_IPTABLES_RULE  = "iptables -D OUTPUT -t mangle -p tcp --sport %d -j MARK --set-mark %d";
-    private boolean success;
+    private int exitCode;
 
     public String addTcFilter(int port, int rate) {
         return runShell(String.format(ADD_TC_FILTER, port, rate));
@@ -39,16 +39,16 @@ public class TrafficRule {
         return runShell(String.format(RM_IPTABLES_RULE, port, port));
     }
 
-    public String listTc() {
+    public String displayTc() {
         return runShell(LIST_TC);
     }
 
-    public String listIptables() {
+    public String displayIpTables() {
         return runShell(LIST_IPTABLES);
     }
 
-    public boolean isSuccess() {
-        return success;
+    public int getExitCode() {
+        return exitCode;
     }
 
     private String runShell(String command) {
@@ -58,7 +58,7 @@ public class TrafficRule {
 
     private String runShell(CommandLine commandLine) {
         logger.info(commandLine.toString());
-        success = true;
+        exitCode = -1024;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ByteArrayOutputStream error = new ByteArrayOutputStream();
         PumpStreamHandler streamHandler = new PumpStreamHandler(output, error);
@@ -67,19 +67,17 @@ public class TrafficRule {
         exec.setStreamHandler(streamHandler);
         exec.setWatchdog(watchdog);
         try {
-            int exit = exec.execute(commandLine);
-            logger.info("exit code: " + exit);
+            exitCode = exec.execute(commandLine);
+            logger.info("exit code: " + exitCode);
             String e = error.toString();
             if (!StringUtils.isEmpty(e)) {
                 logger.error(e);
-                success = false;
                 return e;
             }
             String o = output.toString();
             logger.info(o);
             return o;
         } catch (Throwable t) {
-            success = false;
             logger.error(t.getMessage(), t);
             return t.getClass().getName() + ":" + t.getMessage();
         }
