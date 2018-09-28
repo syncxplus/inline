@@ -17,7 +17,7 @@ public class BasicAuthAdapter extends BasicAuthenticationEntryPoint {
         response.addHeader("WWW-Authenticate", "Basic realm=\"" + getRealmName() + "\"");
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         response.setStatus(status.value());
-        response.getWriter().println(new ObjectMapper().writer().writeValueAsString(ApiResponse.failedResponse(status.name()).generate()));
+        response.getWriter().print(new ObjectMapper().writer().writeValueAsString(ApiResponse.failedResponse(status.name()).generate()));
     }
 
     @Override
