@@ -49,6 +49,7 @@ fi
 
 killProcess "inline.*jar"
 [ -e "inline-${VERSION}.jar" ] && rm -rf inline-${VERSION}.jar
+[ -e nohup.out ] && rm -rf nohup.out
 
 set -euo pipefail
 
