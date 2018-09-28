@@ -18,8 +18,9 @@ public class Rule {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     private String list() {
         StringBuilder sb = new StringBuilder();
-        sb.append("tc").append(System.lineSeparator())
+        sb.append("********** tc **********").append(System.lineSeparator())
                 .append(trafficRule.listTc()).append(System.lineSeparator())
+                .append("********** iptables **********").append(System.lineSeparator())
                 .append(trafficRule.listIptables()).append(System.lineSeparator());
         return sb.toString();
     }
