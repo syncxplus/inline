@@ -1,31 +1,24 @@
 package com.testbird.inline.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
-import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+
+import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
 @Component
-public class RequestLogger implements Filter {
-    private final static Logger logger = LoggerFactory.getLogger(RequestLogger.class);
-
-    @Override
-    public void init(FilterConfig filterConfig) {
-
+@Order(HIGHEST_PRECEDENCE)
+public class RequestLogger extends CommonsRequestLoggingFilter {
+    public RequestLogger() {
+        setIncludeQueryString(true);
+        setIncludeClientInfo(true);
+        setIncludePayload(true);
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest r = (HttpServletRequest) request;
-        logger.info("REQUEST: {} {}", r.getMethod(), r.getRequestURI());
-        chain.doFilter(request, response);
-    }
-
-    @Override
-    public void destroy() {
-
+    protected String createMessage(HttpServletRequest request, String prefix, String suffix)  {
+        return super.createMessage(request, prefix + request.getMethod() + " ", suffix);
     }
 }
