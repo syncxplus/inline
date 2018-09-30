@@ -57,7 +57,7 @@ public class TrafficRule {
     }
 
     private String runShell(CommandLine commandLine) {
-        logger.info(commandLine.toString());
+        logger.info("runShell [" + String.join(" ", commandLine.toStrings()) + "]");
         exitCode = -1024;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ByteArrayOutputStream error = new ByteArrayOutputStream();
