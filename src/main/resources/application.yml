@@ -8,5 +8,6 @@ spring:
   security.user.password: 123456
 
 logging.level.com.testbird: INFO
+logging.level.com.testbird.inline.controller: DEBUG
 
-management.endpoints.web.exposure.include: env,health,httptrace,info,logfile,loggers,metrics,sessions,version
+management.endpoints.web.exposure.include: env,health,httptrace,info,logfile,loggers,metrics,prometheus,sessions,version
