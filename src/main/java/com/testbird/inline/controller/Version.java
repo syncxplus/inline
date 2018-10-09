@@ -1,9 +1,10 @@
 package com.testbird.inline.controller;
 
+import com.testbird.inline.metrics.VersionGauge;
 import com.testbird.inline.util.OutlineApi;
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.common.TextFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
@@ -20,10 +21,11 @@ import java.util.Map;
 @RequestMapping("/version")
 @WebEndpoint(id = "version")
 public class Version {
+    private final static Logger logger = LoggerFactory.getLogger(Version.class);
     private final static String version;
     private final OutlineApi outlineApi;
     private final RestTemplate sslTemplate;
-    private final Gauge gauge;
+    private final VersionGauge gauge;
 
     static {
         StringBuilder sb = new StringBuilder();
@@ -38,25 +40,53 @@ public class Version {
         version = sb.toString();
     }
 
-    public Version(@Autowired OutlineApi outlineApi, @Autowired RestTemplate sslTemplate, @Autowired CollectorRegistry collectorRegistry) {
+    public Version(@Autowired OutlineApi outlineApi, @Autowired RestTemplate sslTemplate, @Autowired VersionGauge versionGauge) {
         this.outlineApi = outlineApi;
         this.sslTemplate = sslTemplate;
-        gauge = Gauge.build().name("app_version").help("server version number").register(collectorRegistry);
-        gauge.set(Double.parseDouble(version));
+        gauge = versionGauge;
+        setVersionGauge();
     }
 
     @ReadOperation
     private Map version() {
+        setVersionGauge();
         Map<String, String> map = new HashMap<>();
         map.put("inline", version);
-        map.put("shadowbox", String.valueOf(sslTemplate.getForObject(outlineApi.version(), Map.class).get("version")));
+        map.put("shadowbox", getShadowboxVersion());
         return ApiResponse.successfulResponse().setData(map).generate();
     }
 
     @RequestMapping(value = {"", "/"}, produces = TextFormat.CONTENT_TYPE_004)
     private String standalone() throws IOException {
         Writer writer = new StringWriter();
-        TextFormat.write004(writer, Collections.enumeration(gauge.collect()));
+        TextFormat.write004(writer, Collections.enumeration(gauge.get().collect()));
         return writer.toString();
+    }
+
+    private String getShadowboxVersion() {
+        String v = "unknown";
+        try {
+            Map map = sslTemplate.getForObject(outlineApi.version(), Map.class);
+            if (map != null && map.get("version") != null) {
+                v = String.valueOf(map.get("version"));
+            }
+        } catch (Throwable t) {
+            logger.error(t.getMessage(), t);
+        }
+        return v;
+    }
+
+    private void setVersionGauge() {
+        if (version.contains("-")) {
+            gauge.get().labels("wrapper").set(Double.parseDouble(version.substring(0, version.indexOf('-'))));
+        } else {
+            gauge.get().labels("wrapper").set(Double.parseDouble(version));
+        }
+        try {
+            double v = Double.parseDouble(getShadowboxVersion());
+            gauge.get().labels("shadowbox").set(v);
+        } catch (Throwable t) {
+            gauge.get().labels("shadowbox").set(-1d);
+        }
     }
 }

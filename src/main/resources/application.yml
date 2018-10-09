@@ -11,3 +11,4 @@ logging.level.com.testbird: INFO
 logging.level.com.testbird.inline.controller: DEBUG
 
 management.endpoints.web.exposure.include: env,health,httptrace,info,logfile,loggers,metrics,sessions,version
+management.metrics.export.prometheus.step: 10m

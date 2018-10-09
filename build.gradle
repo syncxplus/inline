@@ -28,7 +28,7 @@ ext {
      * 2. install.sh: export VERSION
      * 3. git tag
      */
-    String version = '1.1'
+    String version = '1.2-dev'
     new File("$projectDir/src/main/resources/version").text = "$version"
     VERSION = "$version"
 }
