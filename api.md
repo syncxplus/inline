@@ -14,6 +14,7 @@ To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedi
 
 ### 创建用户 ###
 ```POST /outline```
+- location: user country
 
 ### 删除用户 ###
 ```DELETE /outline/{id}```
@@ -26,6 +27,7 @@ To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedi
 
 ### 创建限速用户 ###
 ```POST /outline/rate/{rate}```
+- location: user country
 
 rate | limit
 ---- | ----
