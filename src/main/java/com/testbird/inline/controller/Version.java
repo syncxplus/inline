@@ -44,12 +44,12 @@ public class Version {
         this.outlineApi = outlineApi;
         this.sslTemplate = sslTemplate;
         gauge = versionGauge;
-        setVersionGauge();
+        gauge.get().labels("wrapper").set(VersionGauge.parseVersion(version));
     }
 
     @ReadOperation
     private Map version() {
-        setVersionGauge();
+        gauge.get().labels("shadowbox").set(VersionGauge.parseVersion(getShadowboxVersion()));
         Map<String, String> map = new HashMap<>();
         map.put("inline", version);
         map.put("shadowbox", getShadowboxVersion());
@@ -74,19 +74,5 @@ public class Version {
             logger.error(t.getMessage(), t);
         }
         return v;
-    }
-
-    private void setVersionGauge() {
-        if (version.contains("-")) {
-            gauge.get().labels("wrapper").set(Double.parseDouble(version.substring(0, version.indexOf('-'))));
-        } else {
-            gauge.get().labels("wrapper").set(Double.parseDouble(version));
-        }
-        try {
-            double v = Double.parseDouble(getShadowboxVersion());
-            gauge.get().labels("shadowbox").set(v);
-        } catch (Throwable t) {
-            gauge.get().labels("shadowbox").set(-1d);
-        }
     }
 }
