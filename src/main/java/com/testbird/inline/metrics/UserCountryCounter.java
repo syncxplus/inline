@@ -10,13 +10,14 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Component
 @Scope(SCOPE_SINGLETON)
-public class UserDeleteCounter {
+public class UserCountryCounter {
     private final Counter counter;
 
-    public UserDeleteCounter(@Autowired CollectorRegistry collectorRegistry) {
+    public UserCountryCounter(@Autowired CollectorRegistry collectorRegistry) {
         counter = Counter.build()
-                .name("server_user_delete_count")
-                .help("User delete count")
+                .name("server_user_country_count")
+                .help("User country count")
+                .labelNames("country")
                 .register(collectorRegistry);
     }
 

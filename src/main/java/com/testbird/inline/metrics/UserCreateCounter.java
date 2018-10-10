@@ -15,8 +15,8 @@ public class UserCreateCounter {
 
     public UserCreateCounter(@Autowired CollectorRegistry collectorRegistry) {
         counter = Counter.build()
-                .name("http_request_user_create")
-                .help("User create request")
+                .name("server_user_create_count")
+                .help("User create count")
                 .register(collectorRegistry);
     }
 

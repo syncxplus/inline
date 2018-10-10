@@ -15,8 +15,8 @@ public class HttpRequestCounter {
 
     public HttpRequestCounter(@Autowired CollectorRegistry collectorRegistry) {
         counter = Counter.build()
-                .name("http_request_total")
-                .help("Http request count")
+                .name("server_request_count")
+                .help("Total request count")
                 .labelNames("method", "uri")
                 .register(collectorRegistry);
     }

@@ -15,8 +15,8 @@ public class UserGauge {
 
     public UserGauge(@Autowired CollectorRegistry collectorRegistry) {
         gauge = Gauge.build()
-                .name("server_user_total")
-                .help("Active user count")
+                .name("server_user_count")
+                .help("Total user count")
                 .register(collectorRegistry);
     }
 

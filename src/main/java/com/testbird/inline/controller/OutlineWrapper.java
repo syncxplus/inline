@@ -1,5 +1,6 @@
 package com.testbird.inline.controller;
 
+import com.testbird.inline.metrics.UserCountryCounter;
 import com.testbird.inline.metrics.UserCreateCounter;
 import com.testbird.inline.metrics.UserDeleteCounter;
 import com.testbird.inline.metrics.UserGauge;
@@ -12,6 +13,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +30,8 @@ public class OutlineWrapper {
     private UserCreateCounter userCreateCounter;
     @Autowired
     private UserDeleteCounter userDeleteCounter;
+    @Autowired
+    private UserCountryCounter userCountryCounter;
 
     public OutlineWrapper(@Autowired OutlineApi outlineApi, @Autowired RestTemplate sslTemplate, @Autowired TrafficRule trafficRule) {
         this.outlineApi = outlineApi;
@@ -42,8 +46,9 @@ public class OutlineWrapper {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
-    private Object createUser() {
+    private Object createUser(HttpServletRequest request) {
         userCreateCounter.get().inc();
+        userCountryCounter.get().labels(String.valueOf(request.getParameter("location"))).inc();
         Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
         userGauge.get().inc();
         return ApiResponse.successfulResponse().setData(map).generate();
@@ -52,8 +57,9 @@ public class OutlineWrapper {
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/rate/{rate}", method = RequestMethod.POST)
-    private Object createUserWithRate(@PathVariable("rate") String rate) {
+    private Object createUserWithRate(HttpServletRequest request, @PathVariable("rate") String rate) {
         userCreateCounter.get().inc();
+        userCountryCounter.get().labels(String.valueOf(request.getParameter("location"))).inc();
         Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
         userGauge.get().inc();
         String port = String.valueOf(map.get("port"));
