@@ -34,6 +34,7 @@ ext {
 }
 
 bootJar {
+    exclude 'application.properties'
     baseName 'inline'
     version VERSION
 }
