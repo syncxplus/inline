@@ -18,9 +18,9 @@ public class RequestLogger extends CommonsRequestLoggingFilter {
     private HttpRequestCounter httpRequestCounter;
 
     public RequestLogger() {
-        setIncludeQueryString(true);
+        //setIncludeQueryString(true);
         setIncludeClientInfo(true);
-        setIncludePayload(true);
+        //setIncludePayload(true);
     }
 
     @Override
