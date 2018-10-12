@@ -45,6 +45,7 @@ public class Version {
         this.sslTemplate = sslTemplate;
         gauge = versionGauge;
         gauge.get().labels("wrapper").set(VersionGauge.parseVersion(version));
+        gauge.get().labels("shadowbox").set(VersionGauge.parseVersion(getShadowboxVersion()));
     }
 
     @ReadOperation
