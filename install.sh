@@ -1,7 +1,7 @@
 #!/bin/sh
 
 export LOGGING_PATH=/root/logs
-export VERSION=1.2-beta
+export VERSION=1.2
 export SB_VERSION=1.2
 export SB_RESET=1
 
