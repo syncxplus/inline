@@ -1,8 +1,9 @@
 #!/bin/sh
 
+export LOGGING_PATH=/root/logs
 export VERSION=1.2-beta
 export SB_VERSION=1.2
-export LOGGING_PATH=/root/logs
+export SB_RESET=1
 
 function checkCommand {
     command -v ${1} >/dev/null 2>&1 || {
