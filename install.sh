@@ -1,10 +1,5 @@
 #!/bin/sh
 
-export LOGGING_PATH=/root/logs
-export VERSION=1.2
-export SB_VERSION=1.2
-export SB_RESET=1
-
 function checkCommand {
     command -v ${1} >/dev/null 2>&1 || {
         return 1
@@ -32,6 +27,22 @@ function killProcess {
     fi
 }
 
+export LOGGING_PATH=/root/logs
+export VERSION=1.2
+
+set -ex
+if checkCommand unzip; then
+  echo unzip already installed
+else
+  yum install -y unzip
+fi
+if [ ! -e "inline-${VERSION}.jar" ]; then
+  curl -OL https://github.com/syncxplus/inline/releases/download/${VERSION}/inline-${VERSION}.zip
+  unzip -o inline-${VERSION}.zip
+  rm -rf inline-${VERSION}.zip
+fi
+set +ex
+
 if checkCommand pstree; then
     echo pstree already installed
 else
@@ -42,19 +53,6 @@ else
     fi
 fi
 
-if checkCommand unzip; then
-    echo unzip already installed
-else
-    yum install -y unzip
-fi
-
 killProcess "inline.*jar"
-[ -e "inline-${VERSION}.jar" ] && rm -rf inline-${VERSION}.jar
 [ -e nohup.out ] && rm -rf nohup.out
-
-set -euo pipefail
-
-curl -OL https://github.com/syncxplus/inline/releases/download/${VERSION}/inline-${VERSION}.zip
-unzip -o inline-${VERSION}.zip && rm -rf inline-${VERSION}.zip
-curl https://raw.githubusercontent.com/syncxplus/shadowbox/shadowbox/src/server_manager/install_scripts/install_server.sh | bash
 nohup java -jar inline-${VERSION}.jar ${1:-} &
