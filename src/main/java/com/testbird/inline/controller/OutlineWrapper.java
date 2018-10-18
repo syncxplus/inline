@@ -14,6 +14,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,6 +103,21 @@ public class OutlineWrapper {
             return ApiResponse.successfulResponse().setData(map).generate();
         } else {
             return ApiResponse.failedResponse(response.getStatusCode().name()).generate();
+        }
+    }
+
+    /**
+     * @reset: This is a debug API
+     */
+    @RequestMapping("/reset")
+    private void reset() {
+        String path = "/root/shadowbox/persisted-state/shadowbox_config.json";
+        String init = "{\"accessKeys\":[{\"id\":\"0\",\"metricsId\":\"7f6f5012-6dcb-469f-8428-bdafa9f4ee6b\",\"name\":\"\",\"port\":1024,\"encryptionMethod\":\"chacha20-ietf-poly1305\",\"password\":\"shadowbox123\"}],\"nextId\":1}";
+        try {
+            Files.write(Paths.get(path), init.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+            Runtime.getRuntime().exec("sudo docker restart shadowbox");
+        } catch (IOException e) {
+            // do nothing
         }
     }
 
