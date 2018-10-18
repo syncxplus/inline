@@ -18,7 +18,7 @@ public class OutlineGauge {
                 .name("server_shadowbox_status")
                 .help("Shadowbox status: 1(OK) 0(NOK)")
                 .register(collectorRegistry);
-        gauge.set(1d);
+        gauge.set(1);
     }
 
     public Gauge get() {

@@ -3,7 +3,6 @@ package com.testbird.inline.controller;
 import com.testbird.inline.metrics.UserCountryCounter;
 import com.testbird.inline.metrics.UserCreateCounter;
 import com.testbird.inline.metrics.UserDeleteCounter;
-import com.testbird.inline.metrics.UserGauge;
 import com.testbird.inline.util.OutlineApi;
 import com.testbird.inline.util.TrafficRule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,6 @@ public class OutlineWrapper {
     private final OutlineApi outlineApi;
     private final RestTemplate sslTemplate;
     private final TrafficRule trafficRule;
-    @Autowired
-    private UserGauge userGauge;
     @Autowired
     private UserCreateCounter userCreateCounter;
     @Autowired
@@ -50,10 +47,8 @@ public class OutlineWrapper {
         userCreateCounter.get().inc();
         userCountryCounter.get().labels(String.valueOf(request.getParameter("location"))).inc();
         Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
-        userGauge.get().inc();
         return ApiResponse.successfulResponse().setData(map).generate();
     }
-
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/rate/{rate}", method = RequestMethod.POST)
@@ -61,7 +56,6 @@ public class OutlineWrapper {
         userCreateCounter.get().inc();
         userCountryCounter.get().labels(String.valueOf(request.getParameter("location"))).inc();
         Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
-        userGauge.get().inc();
         String port = String.valueOf(map.get("port"));
         map.put("add_tc_filter", trafficRule.addTcFilter(Integer.valueOf(port), Integer.valueOf(rate)));
         map.put("add_iptables_rule", trafficRule.addIptablesRule(Integer.valueOf(port)));
@@ -88,7 +82,6 @@ public class OutlineWrapper {
         userDeleteCounter.get().inc();
         ResponseEntity<String> response = sslTemplate.exchange(outlineApi.deleteUser(id), HttpMethod.DELETE, null, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
-            userGauge.get().dec();
             return ApiResponse.successfulResponse().generate();
         } else {
             return ApiResponse.failedResponse(response.getStatusCode().name()).generate();
@@ -101,7 +94,6 @@ public class OutlineWrapper {
         userDeleteCounter.get().inc();
         ResponseEntity<String> response = sslTemplate.exchange(outlineApi.deleteUser(id), HttpMethod.DELETE, null, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
-            userGauge.get().dec();
             Map<String, Object> map = new HashMap<>();
             map.put("rm_iptables_rule", trafficRule.rmIptablesRule(Integer.valueOf(port)));
             map.put("rm_tc_filter", trafficRule.rmTcFilter(Integer.valueOf(port), Integer.valueOf(rate)));

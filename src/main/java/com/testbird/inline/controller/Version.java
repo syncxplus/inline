@@ -44,21 +44,19 @@ public class Version {
         this.outlineApi = outlineApi;
         this.sslTemplate = sslTemplate;
         gauge = versionGauge;
-        gauge.get().labels("wrapper").set(VersionGauge.parseVersion(version));
-        gauge.get().labels("shadowbox").set(VersionGauge.parseVersion(getShadowboxVersion()));
+        gauge.get().labels(VersionGauge.VERSION_LABEL_WRAPPER).set(VersionGauge.parseVersion(version));
     }
 
     @ReadOperation
     private Map version() {
-        gauge.get().labels("shadowbox").set(VersionGauge.parseVersion(getShadowboxVersion()));
         Map<String, String> map = new HashMap<>();
-        map.put("inline", version);
-        map.put("shadowbox", getShadowboxVersion());
+        map.put(VersionGauge.VERSION_LABEL_WRAPPER, version);
+        map.put(VersionGauge.VERSION_LABEL_SHADOWBOX, getShadowboxVersion());
         return ApiResponse.successfulResponse().setData(map).generate();
     }
 
     @RequestMapping(value = {"", "/"}, produces = TextFormat.CONTENT_TYPE_004)
-    private String standalone() throws IOException {
+    private String metrics() throws IOException {
         Writer writer = new StringWriter();
         TextFormat.write004(writer, Collections.enumeration(gauge.get().collect()));
         return writer.toString();
@@ -67,7 +65,7 @@ public class Version {
     private String getShadowboxVersion() {
         String v = "unknown";
         try {
-            Map map = sslTemplate.getForObject(outlineApi.version(), Map.class);
+            Map map = sslTemplate.getForObject(outlineApi.info(), Map.class);
             if (map != null && map.get("version") != null) {
                 v = String.valueOf(map.get("version"));
             }

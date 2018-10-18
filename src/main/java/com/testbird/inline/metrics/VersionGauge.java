@@ -19,6 +19,9 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Component
 @Scope(SCOPE_SINGLETON)
 public class VersionGauge {
+    public final static String VERSION_LABEL_OS = "os";
+    public final static String VERSION_LABEL_SHADOWBOX = "shadowbox";
+    public final static String VERSION_LABEL_WRAPPER = "wrapper";
     private static final String OS_NAME = "os.name";
     private static final String OS_VERSION = "os.version";
     private static final String OS_RELEASE = "cat /etc/redhat-release";

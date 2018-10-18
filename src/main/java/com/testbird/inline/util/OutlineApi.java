@@ -3,7 +3,6 @@ package com.testbird.inline.util;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-
 /**
  * @see <a href="https://github.com/Jigsaw-Code/outline-server/tree/master/src/shadowbox#access-keys-management-api">shadowbox rest api</a>
  */
@@ -54,7 +53,7 @@ public class OutlineApi {
         return String.format("https://%s:%s/%s/metrics/transfer", host, port, key);
     }
 
-    public String version() {
-        return String.format("https://%s:%s/%s/version", host, port, key);
+    public String info() {
+        return String.format("https://%s:%s/%s/info", host, port, key);
     }
 }
