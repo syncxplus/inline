@@ -62,6 +62,10 @@ public class VersionGauge {
         return gauge;
     }
 
+    public static String getOS() {
+        return osName;
+    }
+
     public static double parseVersion(String version) {
         Matcher m = Pattern.compile("(\\d+\\.\\d+)").matcher(version);
         if (m.find()) {
