@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +27,7 @@ public class Version {
     private final OutlineApi outlineApi;
     private final RestTemplate sslTemplate;
     private final VersionGauge gauge;
+    private static long expiredTime = System.currentTimeMillis();
 
     static {
         StringBuilder sb = new StringBuilder();
@@ -55,11 +57,21 @@ public class Version {
         return ApiResponse.successfulResponse().setData(map).generate();
     }
 
+    @Cacheable(cacheNames = "version", condition = "!#root.target.isExpired()")
     @RequestMapping(value = {"", "/"}, produces = TextFormat.CONTENT_TYPE_004)
-    private String metrics() throws IOException {
+    public String metrics() throws IOException {
         Writer writer = new StringWriter();
         TextFormat.write004(writer, Collections.enumeration(gauge.get().collect()));
         return writer.toString();
+    }
+
+    public boolean isExpired() {
+        if (expiredTime < System.currentTimeMillis()) {
+            expiredTime = System.currentTimeMillis() + 300000;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private String getShadowboxVersion() {
