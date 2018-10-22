@@ -28,7 +28,7 @@ function killProcess {
 }
 
 export LOGGING_PATH=/root/logs
-export VERSION=1.3
+export VERSION=1.4
 
 set -ex
 if checkCommand unzip; then
