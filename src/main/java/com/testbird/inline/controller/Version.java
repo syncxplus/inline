@@ -50,7 +50,7 @@ public class Version {
     }
 
     @ReadOperation
-    private Map version() {
+    public Map version() {
         Map<String, String> map = new HashMap<>();
         map.put(VersionGauge.VERSION_LABEL_WRAPPER, version);
         map.put(VersionGauge.VERSION_LABEL_SHADOWBOX, getShadowboxVersion());
