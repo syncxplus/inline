@@ -2,6 +2,7 @@ package com.testbird.inline.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.testbird.inline.metrics.OutlineGauge;
+import com.testbird.inline.metrics.PortGauge;
 import com.testbird.inline.metrics.UserGauge;
 import com.testbird.inline.metrics.VersionGauge;
 import com.testbird.inline.util.OutlineApi;
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -26,6 +28,8 @@ public class OutlineStatus {
     private VersionGauge versionGauge;
     @Autowired
     private UserGauge userGauge;
+    @Autowired
+    private PortGauge portGauge;
 
     public OutlineStatus(@Autowired OutlineApi outlineApi, @Autowired RestTemplate sslTemplate) {
         this.outlineApi = outlineApi;
@@ -52,7 +56,9 @@ public class OutlineStatus {
             versionGauge.get().labels(VersionGauge.VERSION_LABEL_SHADOWBOX)
                     .set(VersionGauge.parseVersion(String.valueOf(map.get("version"))));
             userGauge.get()
-                    .set(Double.parseDouble(String.valueOf(map.get("userCount"))) - 1);
+                    .set(Double.parseDouble(String.valueOf(map.getOrDefault("userCount", 0))));
+            portGauge.get()
+                    .set(Double.parseDouble(String.valueOf(map.getOrDefault("activePortCount", 0))));
         }
     }
 
@@ -60,5 +66,6 @@ public class OutlineStatus {
         outlineGauge.get().set(0);
         versionGauge.get().labels(VersionGauge.VERSION_LABEL_SHADOWBOX).set(-1);
         userGauge.get().set(-1);
+        portGauge.get().set(-1);
     }
 }
