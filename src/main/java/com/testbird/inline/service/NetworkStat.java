@@ -50,20 +50,19 @@ public class NetworkStat {
                             Map eth0 = stat.get("eth0");
                             logger.debug(String.valueOf(eth0.get("rx_bytes")));
                             logger.debug(String.valueOf(eth0.get("tx_bytes")));
-                            double rx = Double.parseDouble(String.valueOf(eth0.get("rx_bytes")));
                             double prx = networkGauge.get().labels("rx").get();
-                            if (prx < 0 || rx < prx) {
-                                networkGauge.get().labels("rx").set(rx);
-                            } else {
-                                networkGauge.get().labels("rx").set(rx - prx);
+                            double rx = Double.parseDouble(String.valueOf(eth0.get("rx_bytes"))) / 1024 / 5;
+                            if (prx > 0 || rx > prx) {
+                                rx -= prx;
                             }
-                            double tx = Double.parseDouble(String.valueOf(eth0.get("tx_bytes")));
                             double ptx = networkGauge.get().labels("tx").get();
-                            if (ptx < 0 || tx < ptx) {
-                                networkGauge.get().labels("tx").set(tx);
-                            } else {
-                                networkGauge.get().labels("tx").set(tx - ptx);
+                            double tx = Double.parseDouble(String.valueOf(eth0.get("tx_bytes"))) / 1024 / 5;
+                            if (ptx > 0 || tx > ptx) {
+                                tx -= ptx;
                             }
+                            networkGauge.get().labels("rx").set(rx);
+                            networkGauge.get().labels("tx").set(tx);
+                            networkGauge.get().labels("all").set(rx + tx);
                         }
                     }
                 }
