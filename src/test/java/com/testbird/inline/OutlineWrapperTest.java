@@ -35,6 +35,7 @@ public class OutlineWrapperTest {
     private final static String TEST_NAME = "inline";
     private final static ObjectMapper MAPPER = new ObjectMapper();
     private static String userId;
+    private static String port;
     private MockMvc mvc;
 
     @Autowired
@@ -64,10 +65,10 @@ public class OutlineWrapperTest {
      */
     @Test
     public void t1CreateUser() throws Exception {
-        Map response = execute(mvc.perform(post(CONTEXT).with(httpBasic(username, password))));
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        Map response = execute(mvc.perform(post(CONTEXT + "/rate/10").with(httpBasic(username, password))));
         Assert.assertEquals(response.get("status"), true);
         userId = String.valueOf(response.get("id"));
+        port = String.valueOf(response.get("rate"));
     }
 
     @Test
@@ -78,7 +79,6 @@ public class OutlineWrapperTest {
                 .param("name", TEST_NAME)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         ));
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         Assert.assertEquals(response.get("status"), true);
     }
 
@@ -91,14 +91,12 @@ public class OutlineWrapperTest {
     @Test
     public void t3ListUsers() throws Exception {
         Map response = execute(mvc.perform(get(CONTEXT).with(httpBasic(username, password))));
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(response));
         Assert.assertEquals(response.get("status"), true);
     }
 
     @Test
     public void t4DeleteUser() throws Exception {
-        Map response = execute(mvc.perform(delete(CONTEXT + "/" + userId).with(httpBasic(username, password))));
-        System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(response));
+        Map response = execute(mvc.perform(delete(CONTEXT + "/" + userId + "/port/" + port + "/rate/10").with(httpBasic(username, password))));
         Assert.assertEquals(response.get("status"), true);
     }
 

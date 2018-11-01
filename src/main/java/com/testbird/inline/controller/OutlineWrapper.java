@@ -58,7 +58,11 @@ public class OutlineWrapper {
     private Object createUserWithRate(HttpServletRequest request, @PathVariable("rate") String rate) {
         userCreateCounter.get().inc();
         userCountryCounter.get().labels(String.valueOf(request.getParameter("location"))).inc();
-        Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> params= new LinkedMultiValueMap<>();
+        params.add("rate", rate);
+        Map map = sslTemplate.postForObject(outlineApi.createUser(), new HttpEntity<>(params, headers), Map.class);
         String port = String.valueOf(map.get("port"));
         map.put("add_tc_filter", trafficRule.addTcFilter(Integer.valueOf(port), Integer.valueOf(rate)));
         map.put("add_iptables_rule", trafficRule.addIptablesRule(Integer.valueOf(port)));
