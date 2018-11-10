@@ -43,6 +43,14 @@ if [ ! -e "inline-${VERSION}.jar" ]; then
 fi
 set +ex
 
+[ ! -e "/usr/lib64/libtcnative-1.so" ] && {
+  yum install -y apr
+  tcnative=tomcat-native-1.2.17-1.el7.x86_64.rpm
+  curl -OL http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/t/${tcnative}
+  rpm -ivh ${tcnative}
+  rm -rf ${tcnative}
+}
+
 if checkCommand pstree; then
     echo pstree already installed
 else
