@@ -33,6 +33,10 @@ public class OutlineApi {
         return String.format("https://%s:%s/%s/access-keys/", host, port, key);
     }
 
+    public String createMultiUser(int count) {
+        return String.format("https://%s:%s/%s/access-keys/%d", host, port, key, count);
+    }
+
     public String updateUserName(String userId) {
         return String.format("https://%s:%s/%s/access-keys/%s/name", host, port, key, userId);
     }

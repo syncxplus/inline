@@ -1,8 +1,6 @@
 package com.testbird.inline.controller;
 
 import com.testbird.inline.metrics.UserCountryCounter;
-import com.testbird.inline.metrics.UserCreateCounter;
-import com.testbird.inline.metrics.UserDeleteCounter;
 import com.testbird.inline.util.OutlineApi;
 import com.testbird.inline.util.TrafficRule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -26,10 +25,6 @@ public class OutlineWrapper {
     private final OutlineApi outlineApi;
     private final RestTemplate sslTemplate;
     private final TrafficRule trafficRule;
-    @Autowired
-    private UserCreateCounter userCreateCounter;
-    @Autowired
-    private UserDeleteCounter userDeleteCounter;
     @Autowired
     private UserCountryCounter userCountryCounter;
 
@@ -47,25 +42,48 @@ public class OutlineWrapper {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     private Object createUser(HttpServletRequest request) {
-        userCreateCounter.get().inc();
         userCountryCounter.get().labels(String.valueOf(request.getParameter("location"))).inc();
         Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
         return ApiResponse.successfulResponse().setData(map).generate();
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value = "/rate/{rate}", method = RequestMethod.POST)
-    private Object createUserWithRate(HttpServletRequest request, @PathVariable("rate") String rate) {
-        userCreateCounter.get().inc();
+    @RequestMapping(value = {"/rate/{rate}", "/rate/{rate}/count/{count}"}, method = RequestMethod.POST)
+    private Object createUserWithRate(HttpServletRequest request, @PathVariable String rate, @PathVariable(required = false) String count) {
         userCountryCounter.get().labels(String.valueOf(request.getParameter("location"))).inc();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> params= new LinkedMultiValueMap<>();
         params.add("rate", rate);
-        Map map = sslTemplate.postForObject(outlineApi.createUser(), new HttpEntity<>(params, headers), Map.class);
-        String port = String.valueOf(map.get("port"));
-        map.put("add_tc_filter", trafficRule.addTcFilter(Integer.valueOf(port), Integer.valueOf(rate)));
-        map.put("add_iptables_rule", trafficRule.addIptablesRule(Integer.valueOf(port)));
+        String api;
+        if (count != null) {
+            int c = 1;
+            try {
+                c = Integer.parseInt(count);
+            } catch (Exception e) {
+                // ignored
+            }
+            api = outlineApi.createMultiUser(c);
+        } else {
+            api = outlineApi.createUser();
+        }
+        Object o = sslTemplate.postForObject(api, new HttpEntity<>(params, headers), Object.class);
+        Map map;
+        if (o instanceof Map) {
+            map = (Map) o;
+            String port = String.valueOf(map.get("port"));
+            trafficRule.addTcFilter(Integer.valueOf(port), Integer.valueOf(rate));
+            trafficRule.addIptablesRule(Integer.valueOf(port));
+        } else {
+            List<Map> list = (List<Map>) o;
+            list.forEach(m -> {
+                String port = String.valueOf(m.get("port"));
+                trafficRule.addTcFilter(Integer.valueOf(port), Integer.valueOf(rate));
+                trafficRule.addIptablesRule(Integer.valueOf(port));
+            });
+            map = new HashMap();
+            map.put("accounts", o);
+        }
         return ApiResponse.successfulResponse().setData(map).generate();
     }
 
@@ -86,7 +104,6 @@ public class OutlineWrapper {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     private Object deleteUser(@PathVariable("id") String id) {
-        userDeleteCounter.get().inc();
         ResponseEntity<String> response = sslTemplate.exchange(outlineApi.deleteUser(id), HttpMethod.DELETE, null, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
             return ApiResponse.successfulResponse().generate();
@@ -98,7 +115,6 @@ public class OutlineWrapper {
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/{id}/port/{port}/rate/{rate}", method = RequestMethod.DELETE)
     private Object deleteUser(@PathVariable("id") String id, @PathVariable("port") String port, @PathVariable("rate") String rate) {
-        userDeleteCounter.get().inc();
         ResponseEntity<String> response = sslTemplate.exchange(outlineApi.deleteUser(id), HttpMethod.DELETE, null, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
             Map<String, Object> map = new HashMap<>();
@@ -121,7 +137,7 @@ public class OutlineWrapper {
             Files.write(Paths.get(path), init.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
             Runtime.getRuntime().exec("sudo docker restart shadowbox");
         } catch (IOException e) {
-            // do nothing
+            e.printStackTrace();
         }
     }
 
