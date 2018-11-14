@@ -8,6 +8,8 @@ To access the API, use Authorization header for [BASIC AUTH](https://en.wikipedi
 * [修改用户名称](#修改用户名称)
 * [创建限速用户](#创建限速用户)
 * [删除限速用户](#删除限速用户)
+* [批量创建](#批量创建)
+* [批量删除](#批量删除)
 
 ### 用户列表 ###
 ```GET /outline```
@@ -42,6 +44,15 @@ rate | limit
 ### 删除限速用户 ###
 ```DELETE /outline/{id}/port/{port}/rate/{rate}```
 
+### 批量创建 ###
+```POST /outline/rate/{rate}/count/{count}```
+
+### 批量删除 ###
+```DELETE /outline```
+- Content-Type: application/json
+- accounts: [{"id":1,"port":2,"rate":3},{"id":1,"port":2,"rate":3},...]
+
+
 # Example #
 ```
 创建用户：curl -u user:123456 -X POST http://127.0.0.1:8080/outline/
@@ -58,4 +69,6 @@ rate | limit
 
 创建限速用户：curl -u user:123456 -X POST http://45.76.213.221:8080/outline/rate/5
 删除限速用户：curl -u user:123456 -X DELETE http://127.0.0.1:8080/outline/21/port/12384/rate/5
+
+批量删除：curl -u user:123456 -H 'Content-Type:application/json' -X DELETE -d '[{"id":1,"port":2,"rate":3},{"id":1,"port":2,"rate":3}]' http://127.0.0.1:8080/outline
 ```

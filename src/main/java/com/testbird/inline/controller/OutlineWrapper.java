@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,32 @@ public class OutlineWrapper {
         userCountryCounter.get().labels(String.valueOf(request.getParameter("location"))).inc();
         Map map = sslTemplate.postForObject(outlineApi.createUser(), null, Map.class);
         return ApiResponse.successfulResponse().setData(map).generate();
+    }
+
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.DELETE)
+    private Object deleteUsers(@RequestBody(required = false) List<Map<String, Integer>> accounts) {
+        List<Integer> accessKeys = new ArrayList<>();
+        accounts.forEach(account -> {
+            Integer id = account.get("id");
+            if (id != null) {
+                accessKeys.add(id);
+            }
+            Integer port = account.get("port");
+            Integer rate = account.get(("rate"));
+            if (port != null) {
+                trafficRule.rmIptablesRule(port);
+                if (rate != null) {
+                    trafficRule.rmTcFilter(port, rate);
+                }
+            }
+        });
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, List> params= new HashMap<>();
+        params.put("accessKeys", accessKeys);
+        HttpEntity<Map<String, List>> entity = new HttpEntity<>(params, headers);
+        ResponseEntity<Map> response = sslTemplate.exchange(outlineApi.deleteUsers(), HttpMethod.DELETE, entity, Map.class);
+        return ApiResponse.successfulResponse().setData(response.getBody()).generate();
     }
 
     @SuppressWarnings("unchecked")
