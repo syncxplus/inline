@@ -1,4 +1,4 @@
-version: ${VERSION}
+version: ${VERSION:0}
 outline.server:
   host: 127.0.0.1
   port: 1023
