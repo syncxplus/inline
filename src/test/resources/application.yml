@@ -1,0 +1,11 @@
+version: ${VERSION:0}
+outline.server:
+  host: 127.0.0.1
+  port: 1023
+  key: YiSSP-HOknt1mM7vKiu4DA
+
+spring:
+  mvc.throw-exception-if-no-handler-found: true
+  security.user.password: 123456
+
+logging.level.com.testbird: DEBUG
