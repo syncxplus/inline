@@ -28,7 +28,7 @@ ext {
      * 2. install.sh: export VERSION
      * 3. git tag
      */
-    VERSION = "1.7"
+    VERSION = "1.8"
 }
 
 bootJar {

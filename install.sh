@@ -41,7 +41,7 @@ killProcess "inline.*jar"
 
 [ -e nohup.out ] && rm -rf nohup.out
 
-VERSION=1.7
+VERSION=1.8
 
 docker pull syncxplus/inline:${VERSION}
 container=$(docker ps -a|grep inline|awk '{print $1}')
