@@ -27,30 +27,6 @@ function killProcess {
     fi
 }
 
-export LOGGING_PATH=/root/logs
-export VERSION=1.7
-
-set -ex
-if checkCommand unzip; then
-  echo unzip already installed
-else
-  yum install -y unzip
-fi
-if [ ! -e "inline-${VERSION}.jar" ]; then
-  curl -OL https://github.com/syncxplus/inline/releases/download/${VERSION}/inline-${VERSION}.zip
-  unzip -o inline-${VERSION}.zip
-  rm -rf inline-${VERSION}.zip
-fi
-set +ex
-
-[ ! -e "/usr/lib64/libtcnative-1.so" ] && {
-  yum install -y apr
-  tcnative=tomcat-native-1.2.17-1.el7.x86_64.rpm
-  curl -OL http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/t/${tcnative}
-  rpm -ivh ${tcnative}
-  rm -rf ${tcnative}
-}
-
 if checkCommand pstree; then
     echo pstree already installed
 else
@@ -62,5 +38,11 @@ else
 fi
 
 killProcess "inline.*jar"
+
 [ -e nohup.out ] && rm -rf nohup.out
-nohup java -jar inline-${VERSION}.jar ${1:-} &
+
+container=$(docker ps -a|grep inline|awk '{print $1}')
+[[ ! -z "${container}" ]] && {
+    docker rm -f -v ${container}
+}
+docker run --restart always --name inline -d --net host -p 8080:8080 --privileged -v /root/logs:/usr/bin/app/logs syncxplus/inline
