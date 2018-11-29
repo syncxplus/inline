@@ -7,6 +7,16 @@ function checkCommand {
     return 0
 }
 
+if checkCommand pstree; then
+    echo pstree already installed
+else
+    if [ `uname -s` != Darwin ]; then
+        yum install -y psmisc
+    else
+        brew install pstree
+    fi
+fi
+
 function killProcess {
     pid=$(ps -ef |grep "${1}" |grep -v grep |awk "{print \$2}")
     if [ ! -z ${pid} ]; then
@@ -27,23 +37,15 @@ function killProcess {
     fi
 }
 
-if checkCommand pstree; then
-    echo pstree already installed
-else
-    if [ `uname -s` != Darwin ]; then
-        yum install -y psmisc
-    else
-        brew install pstree
-    fi
-fi
-
 killProcess "inline.*jar"
 
 [ -e nohup.out ] && rm -rf nohup.out
 
+VERSION=1.7
+
+docker pull syncxplus/inline:${VERSION}
 container=$(docker ps -a|grep inline|awk '{print $1}')
 [[ ! -z "${container}" ]] && {
     docker rm -f -v ${container}
 }
-docker pull syncxplus/inline
-docker run --restart always --name inline -d --net host -p 8080:8080 --privileged -v /root/logs:/root/logs syncxplus/inline
+docker run --restart always --name inline -d --net host -p 8080:8080 --privileged -v /root/logs:/root/logs syncxplus/inline:${VERSION}
