@@ -27,7 +27,7 @@ public class NetworkStat {
 
     @Scheduled(cron = "0 */5 * * * *")
     public void calcNetworkStat() {
-        if (Objects.equals(VersionGauge.getOS(), "centos")) {
+        if (Objects.equals(VersionGauge.getOS(), "linux")) {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             ByteArrayOutputStream error = new ByteArrayOutputStream();
             PumpStreamHandler streamHandler = new PumpStreamHandler(output, error);

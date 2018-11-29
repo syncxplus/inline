@@ -1,10 +1,8 @@
 /.idea
-/.git
 /.gradle
 /build
 /out
 .dockerignore
-.gitignore
 *.iml
 Dockerfile
 **/application.properties
