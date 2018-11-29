@@ -1,8 +1,0 @@
-/.idea
-/.gradle
-/build
-/out
-.dockerignore
-*.iml
-Dockerfile
-**/application.properties

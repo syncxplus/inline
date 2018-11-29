@@ -45,4 +45,5 @@ container=$(docker ps -a|grep inline|awk '{print $1}')
 [[ ! -z "${container}" ]] && {
     docker rm -f -v ${container}
 }
-docker run --restart always --name inline -d --net host -p 8080:8080 --privileged -v /root/logs:/usr/bin/app/logs syncxplus/inline
+docker pull syncxplus/inline
+docker run --restart always --name inline -d --net host -p 8080:8080 --privileged -v /root/logs:/root/logs syncxplus/inline

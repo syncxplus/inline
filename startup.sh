@@ -11,9 +11,6 @@ tc class add dev eth0 parent 1:1 classid 1:80 htb rate 8000Kbit ceil 8192Kbit pr
 tc class add dev eth0 parent 1:1 classid 1:100 htb rate 10000Kbit ceil 10240Kbit prio 1
 tc class add dev eth0 parent 1:1 classid 1:200 htb rate 20000Kbit ceil 20480Kbit prio 1
 
-gradle clean
-gradle bootJar
-cd build/libs
-jar=`ls *.jar`
-export LOGGING_PATH=/usr/bin/app/logs
+jar=`ls /root/*.jar`
+export LOGGING_PATH=/root/logs
 java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -jar ${jar} $1
