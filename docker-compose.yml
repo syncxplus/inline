@@ -1,0 +1,15 @@
+version: '2'
+services:
+  shadowbox:
+    image: syncxplus/shadowbox:1.9.1
+    restart: always
+    network_mode: host
+    volumes:
+      - ./shadowbox:/root/shadowbox/persisted-state
+  inline:
+    image: syncxplus/inline:1.9.1
+    restart: always
+    network_mode: host
+    privileged: true
+    volumes:
+      - ./inline/logs:/root/logs

@@ -1,51 +1,26 @@
 #!/bin/sh
 
+set -euo pipefail
+
 function checkCommand {
-    command -v ${1} >/dev/null 2>&1 || {
-        return 1
-    }
-    return 0
+  command -v ${1} >/dev/null 2>&1 || {
+    return 1
+  }
+  return 0
 }
 
-if checkCommand pstree; then
-    echo pstree already installed
+if checkCommand docker-compose; then
+  echo docker-compose already installed
 else
-    if [ `uname -s` != Darwin ]; then
-        yum install -y psmisc
-    else
-        brew install pstree
-    fi
+  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+  python get-pip.py
+  rm -rf get-pip.py
+  pip install docker-compose --ignore-installed
 fi
 
-function killProcess {
-    pid=$(ps -ef |grep "${1}" |grep -v grep |awk "{print \$2}")
-    if [ ! -z ${pid} ]; then
-        all=(${pid//\s+/ })
-        for id in ${all[@]}
-        do
-            if [ "${id}" -gt 0 ] 2>/dev/null ;then
-                echo "kill ${id}"
-                if [ `uname -s` != Darwin ]; then
-                    pstree -p $id| awk -F"[()]" "{system(\"kill \"\$2)}"
-                else
-                    pstree -g3 -l2 -U $id| awk "{system(\"kill \"\$2)}"
-                fi
-            else
-                echo "ignore ${id}"
-            fi
-        done
-    fi
-}
+curl -H 'Cache-Control:no-cache' -OL https://raw.githubusercontent.com/syncxplus/inline/docker-compose/docker-compose.yml
 
-killProcess "inline.*jar"
+[[ ! -z "$(docker ps -a|grep inline$)" ]] && docker rm -vf inline
+[[ ! -z "$(docker ps -a|grep shadowbox$)" ]] && docker rm -vf shadowbox
 
-[ -e nohup.out ] && rm -rf nohup.out
-
-VERSION=1.8
-
-docker pull syncxplus/inline:${VERSION}
-container=$(docker ps -a|grep inline|awk '{print $1}')
-[[ ! -z "${container}" ]] && {
-    docker rm -f -v ${container}
-}
-docker run --restart always --name inline -d --net host -p 8080:8080 --privileged -v /root/logs:/root/logs syncxplus/inline:${VERSION}
+docker-compose up -d
