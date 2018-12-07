@@ -46,6 +46,8 @@ public class NetworkStat {
                         if (eth0.length > 7) {
                             int rxStat = parseStatBytes(eth0[5].toLowerCase());
                             int txStat = parseStatBytes(eth0[7].toLowerCase());
+                            if (rxStat < 0) rxStat = 0;
+                            if (txStat < 0) txStat = 0;
                             networkGauge.get().labels("rx").set(rxStat);
                             networkGauge.get().labels("tx").set(txStat);
                             networkGauge.get().labels("all").set(rxStat + txStat);
