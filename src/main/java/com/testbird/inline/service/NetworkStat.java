@@ -44,8 +44,8 @@ public class NetworkStat {
                     if (lines.length > 3) {
                         String[] eth0 = lines[3].split("\\s+");
                         if (eth0.length > 7) {
-                            double rxStat = parseStatBytes(eth0[5].toLowerCase());
-                            double txStat = parseStatBytes(eth0[7].toLowerCase());
+                            int rxStat = parseStatBytes(eth0[5].toLowerCase());
+                            int txStat = parseStatBytes(eth0[7].toLowerCase());
                             networkGauge.get().labels("rx").set(rxStat);
                             networkGauge.get().labels("tx").set(txStat);
                             networkGauge.get().labels("all").set(rxStat + txStat);
@@ -81,18 +81,18 @@ public class NetworkStat {
         }
     }
 
-    private static double parseStatBytes(String stat) {
+    private static int parseStatBytes(String stat) {
         try {
             if (stat.endsWith("m")) {
-                return Double.parseDouble(stat.substring(0, stat.length() - 1)) * 1024 *1024;
+                return Integer.parseInt(stat.substring(0, stat.length() - 1)) * 1024 *1024;
             } else if (stat.endsWith("k")) {
-                return Double.parseDouble(stat.substring(0, stat.length() - 1)) * 1024;
+                return Integer.parseInt(stat.substring(0, stat.length() - 1)) * 1024;
             } else {
-                return Double.parseDouble(stat);
+                return Integer.parseInt(stat);
             }
         } catch (Throwable t) {
             t.printStackTrace();
-            return  0f;
+            return  0;
         }
     }
 }
