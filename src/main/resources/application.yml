@@ -2,7 +2,7 @@ version: ${VERSION}
 outline.server:
   host: 127.0.0.1
   port: 1023
-  key: YiSSP-HOknt1mM7vKiu4DA
+  context: api
 
 server.tomcat.accesslog:
   directory: /var/log/tomcat

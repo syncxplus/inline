@@ -29,6 +29,7 @@ public class Version {
     private final OutlineApi outlineApi;
     private final RestTemplate sslTemplate;
     private final VersionGauge gauge;
+    private static final long CACHE_TIME = 300000;
     private static long expiredTime = System.currentTimeMillis();
     private static String version;
 
@@ -36,11 +37,12 @@ public class Version {
         this.outlineApi = outlineApi;
         this.sslTemplate = sslTemplate;
         this.gauge = gauge;
-        this.version = version;
-        gauge.get().labels(VersionGauge.VERSION_LABEL_WRAPPER).set(Double.parseDouble(version));
+        Version.version = version;
+        gauge.get().labels(VersionGauge.VERSION_LABEL_WRAPPER).set(VersionGauge.parseVersion(version));
     }
 
     @ReadOperation
+    @RequestMapping("")
     public Map version() {
         Map<String, String> map = new HashMap<>();
         map.put(VersionGauge.VERSION_LABEL_WRAPPER, version);
@@ -49,7 +51,7 @@ public class Version {
     }
 
     @Cacheable(cacheNames = "version", condition = "!#root.target.isExpired()")
-    @RequestMapping(value = {"", "/"}, produces = TextFormat.CONTENT_TYPE_004)
+    @RequestMapping(value = "/", produces = TextFormat.CONTENT_TYPE_004)
     public String metrics() throws IOException {
         Writer writer = new StringWriter();
         TextFormat.write004(writer, Collections.enumeration(gauge.get().collect()));
@@ -58,7 +60,7 @@ public class Version {
 
     public boolean isExpired() {
         if (expiredTime < System.currentTimeMillis()) {
-            expiredTime = System.currentTimeMillis() + 300000;
+            expiredTime = System.currentTimeMillis() + CACHE_TIME;
             return true;
         } else {
             return false;

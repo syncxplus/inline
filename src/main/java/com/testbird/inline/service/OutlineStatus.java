@@ -68,10 +68,10 @@ public class OutlineStatus {
 
     private void setInvalid() {
         outlineGauge.get().set(0);
-        versionGauge.get().labels(VersionGauge.VERSION_LABEL_SHADOWBOX).set(-1);
-        userGauge.get().set(-1);
-        portGauge.get().set(-1);
-        rateGauge.get().labels("20").set(-1);
-        rateGauge.get().labels("80").set(-1);
+        versionGauge.get().labels(VersionGauge.VERSION_LABEL_SHADOWBOX).set(0);
+        userGauge.get().set(0);
+        portGauge.get().set(0);
+        rateGauge.get().labels("20").set(0);
+        rateGauge.get().labels("80").set(0);
     }
 }
