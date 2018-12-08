@@ -1,10 +1,7 @@
 package com.testbird.inline.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.testbird.inline.metrics.OutlineGauge;
-import com.testbird.inline.metrics.PortGauge;
-import com.testbird.inline.metrics.UserGauge;
-import com.testbird.inline.metrics.VersionGauge;
+import com.testbird.inline.metrics.*;
 import com.testbird.inline.util.OutlineApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +26,8 @@ public class OutlineStatus {
     private UserGauge userGauge;
     @Autowired
     private PortGauge portGauge;
+    @Autowired
+    private RateGauge rateGauge;
 
     public OutlineStatus(@Autowired OutlineApi outlineApi, @Autowired RestTemplate sslTemplate) {
         this.outlineApi = outlineApi;
@@ -58,6 +57,12 @@ public class OutlineStatus {
                     .set(Double.parseDouble(String.valueOf(map.getOrDefault("userCount", 0))));
             portGauge.get()
                     .set(Double.parseDouble(String.valueOf(map.getOrDefault("activePortCount", 0))));
+            rateGauge.get()
+                    .labels("20")
+                    .set(Double.parseDouble(String.valueOf(map.getOrDefault("activePortRate20Count", 0))));
+            rateGauge.get()
+                    .labels("80")
+                    .set(Double.parseDouble(String.valueOf(map.getOrDefault("activePortRate80Count", 0))));
         }
     }
 
@@ -66,5 +71,7 @@ public class OutlineStatus {
         versionGauge.get().labels(VersionGauge.VERSION_LABEL_SHADOWBOX).set(-1);
         userGauge.get().set(-1);
         portGauge.get().set(-1);
+        rateGauge.get().labels("20").set(-1);
+        rateGauge.get().labels("80").set(-1);
     }
 }
