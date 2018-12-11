@@ -1,7 +1,7 @@
 version: '2'
 services:
   shadowbox:
-    image: syncxplus/shadowbox:1.9.1
+    image: syncxplus/shadowbox:1.9.2
     restart: always
     network_mode: host
     volumes:
