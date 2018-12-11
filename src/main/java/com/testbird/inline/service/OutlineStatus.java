@@ -58,10 +58,16 @@ public class OutlineStatus {
             portGauge.get()
                     .set(Double.parseDouble(String.valueOf(map.getOrDefault("activePortCount", 0))));
             rateGauge.get()
-                    .labels("20")
+                    .labels("20", "user")
+                    .set(Double.parseDouble(String.valueOf(map.getOrDefault("userRate20Count", 0))));
+            rateGauge.get()
+                    .labels("80", "user")
+                    .set(Double.parseDouble(String.valueOf(map.getOrDefault("userRate80Count", 0))));
+            rateGauge.get()
+                    .labels("20", "port")
                     .set(Double.parseDouble(String.valueOf(map.getOrDefault("activePortRate20Count", 0))));
             rateGauge.get()
-                    .labels("80")
+                    .labels("80", "port")
                     .set(Double.parseDouble(String.valueOf(map.getOrDefault("activePortRate80Count", 0))));
         }
     }

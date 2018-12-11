@@ -17,7 +17,7 @@ public class RateGauge {
         gauge = Gauge.build()
                 .name("server_port_rate_count")
                 .help("Count the port with rate")
-                .labelNames("rate")
+                .labelNames("rate", "role")
                 .register(collectorRegistry);
     }
 
