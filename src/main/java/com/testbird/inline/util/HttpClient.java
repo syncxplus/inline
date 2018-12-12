@@ -17,7 +17,8 @@ import java.security.NoSuchAlgorithmException;
 
 @Configuration
 public class HttpClient {
-    private final static int TIMEOUT = 10000; //10s
+    private final static int CONNECT_TIMEOUT = 1000;
+    private final static int READ_TIMEOUT = 20000;
     @Bean(name = "sslTemplate")
     public RestTemplate insecure() {
         try {
@@ -25,8 +26,8 @@ public class HttpClient {
             CloseableHttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).build();
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
-            requestFactory.setConnectTimeout(TIMEOUT);
-            requestFactory.setReadTimeout(TIMEOUT);
+            requestFactory.setConnectTimeout(CONNECT_TIMEOUT);
+            requestFactory.setReadTimeout(READ_TIMEOUT);
             return new RestTemplate(requestFactory);
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
             e.printStackTrace();
