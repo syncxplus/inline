@@ -4,16 +4,11 @@ outline.server:
   port: 1023
   context: api
 
-server.tomcat.accesslog:
-  directory: /var/log/tomcat
-  enabled: true
-
 spring:
   mvc.throw-exception-if-no-handler-found: true
   security.user.password: 123456
 
 logging.level.com.testbird: INFO
-logging.level.com.testbird.inline.controller: DEBUG
 
-management.endpoints.web.exposure.include: env,health,httptrace,info,logfile,loggers,sessions,version
+management.endpoints.web.exposure.include: info,logfile,loggers,version
 management.metrics.export.prometheus.step: 10m

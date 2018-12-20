@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
@@ -19,7 +20,9 @@ public class RequestLogger extends CommonsRequestLoggingFilter {
 
     @Override
     protected void beforeRequest(HttpServletRequest request, String message) {
-        super.beforeRequest(request, message);
+        if (!Objects.equals(request.getRequestURI(), "/metrics") && !Objects.equals(request.getRequestURI(), "/version")) {
+            super.beforeRequest(request, message);
+        }
     }
 
     @Override

@@ -7,7 +7,7 @@ services:
     volumes:
       - ./shadowbox:/root/shadowbox/persisted-state
   inline:
-    image: syncxplus/inline:1.9.4
+    image: syncxplus/inline:1.9.5
     restart: always
     network_mode: host
     privileged: true
