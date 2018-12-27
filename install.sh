@@ -18,7 +18,6 @@ fi
 
 curl -H 'Cache-Control:no-cache' -OL https://raw.githubusercontent.com/syncxplus/inline/master/docker-compose.yml
 
-[[ ! -z "$(docker ps -a|grep inline$)" ]] && docker rm -vf inline
-[[ ! -z "$(docker ps -a|grep shadowbox$)" ]] && docker rm -vf shadowbox
+docker ps -a | grep -v CONTAINER | awk '{print $1}' | xargs docker rm -f -v
 
 docker-compose up -d
