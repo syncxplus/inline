@@ -12,8 +12,8 @@ function checkCommand {
 if checkCommand docker-compose; then
   echo docker-compose already installed
 else
-  curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-  chmod +x /usr/local/bin/docker-compose
+  curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose
+  chmod +x /usr/bin/docker-compose
 fi
 
 curl -H 'Cache-Control:no-cache' -OL https://raw.githubusercontent.com/syncxplus/inline/master/docker-compose.yml
